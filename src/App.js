@@ -31,14 +31,15 @@ class ToDo extends React.Component {
   render() {
     const {
       task: { name, priority, date, id },
-      handleClick
+      handleClick,
+      handleClickDelete
     } = this.props;
 
     return (
       <li className="list-group-item">
-        <div className="mt-2 mb-3 d-flex justify-content-around">
+        <div className="d-flex w-100 justify-content-between">
           <div className="mt-2">{name}</div>
-          <div>
+          <div className="">
             <button
               className={this.btnClass(priority)}
               id={id}
@@ -46,9 +47,16 @@ class ToDo extends React.Component {
             >
               {priority}
             </button>
+            <button
+              className="ml-3 btn btn-danger"
+              id={id}
+              onClick={() => handleClickDelete(id)}
+            >
+              X
+            </button>
           </div>
         </div>
-        <div>{date.toLocaleTimeString()}</div>
+        <small className="mt-3">{date.toLocaleTimeString()}</small>
       </li>
     );
   }
@@ -93,6 +101,7 @@ class ToDoList extends React.Component {
     };
     this.handlePriorityChange = this.handlePriorityChange.bind(this);
     this.calculatePriority = this.calculatePriority.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   calculatePriority(number) {
@@ -104,6 +113,7 @@ class ToDoList extends React.Component {
     return number;
   }
 
+  // change the priority of the task
   handlePriorityChange(id) {
     this.setState((state) => {
       // get the array without the task clicked
@@ -124,6 +134,16 @@ class ToDoList extends React.Component {
     });
   }
 
+  // delete a task
+  handleDelete(id) {
+    this.setState((state) => {
+      const listWithoutClicked = this.state.list.filter(
+        (task) => task.id !== id
+      );
+      return { list: listWithoutClicked };
+    });
+  }
+
   render() {
     return (
       <div>
@@ -135,6 +155,7 @@ class ToDoList extends React.Component {
                 key={task.id}
                 task={task}
                 handleClick={this.handlePriorityChange}
+                handleClickDelete={this.handleDelete}
               />
             );
           })}
