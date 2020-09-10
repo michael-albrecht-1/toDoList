@@ -270,10 +270,6 @@ class ToDoList extends React.Component {
             );
           })}
         </ul>
-        <div className="alert alert-primary mt-3">
-          <h3> Dubug Card</h3>
-          {JSON.stringify(this.state.list)}
-        </div>
       </div>
     );
   }
