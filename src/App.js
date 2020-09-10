@@ -78,7 +78,8 @@ class NewToDo extends React.Component {
     const {
       handleKeyDownAddTask,
       handleNewTaskInputChange,
-      newTaskValue
+      newTaskValue,
+      handleNewTaskInputClick
     } = this.props;
     return (
       <div className="card mb-3 mt-4 ">
@@ -92,6 +93,7 @@ class NewToDo extends React.Component {
               value={newTaskValue}
               onKeyDown={() => handleKeyDownAddTask()}
               onChange={() => handleNewTaskInputChange()}
+              onClick={() => handleNewTaskInputClick()}
             />
           </div>
           <div className="ml-4">
@@ -135,6 +137,7 @@ class ToDoList extends React.Component {
     this.handleTaskValueChange = this.handleTaskValueChange.bind(this);
     this.handleKeyDownAddTask = this.handleKeyDownAddTask.bind(this);
     this.handleNewTaskInputChange = this.handleNewTaskInputChange.bind(this);
+    this.handleNewTaskInputClick = this.handleNewTaskInputClick.bind(this);
   }
 
   // controlled input new task
@@ -144,9 +147,17 @@ class ToDoList extends React.Component {
     });
   }
 
+  // clean the input text when we click inside
+  handleNewTaskInputClick() {
+    this.setState((state) => {
+      if (this.state.newTaskValue === "Ajouter une nouvelle tâche") {
+        return { newTaskValue: "" };
+      }
+    });
+  }
+
   // handle add new task validation form
   // !!! to do : reinit form after adding a new task
-  // !!! clean the input text when we click inside to add a task
   // !!! click "+" button should valid formulary
   handleKeyDownAddTask() {
     console.log("key down : " + event.keyCode);
@@ -233,6 +244,7 @@ class ToDoList extends React.Component {
           handleKeyDownAddTask={this.handleKeyDownAddTask}
           handleNewTaskInputChange={this.handleNewTaskInputChange}
           newTaskValue={this.state.newTaskValue}
+          handleNewTaskInputClick={this.handleNewTaskInputClick}
         />
         <ul className="list-group">
           {this.state.list.map((task) => {
