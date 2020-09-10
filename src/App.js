@@ -1,4 +1,5 @@
 import React from "react";
+import uuid from "react-uuid";
 import "./styles.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
@@ -30,7 +31,7 @@ class ToDo extends React.Component {
 
   render() {
     const {
-      task: { name, priority, date, id },
+      task: { name, priority, date, uuid },
       handleClickPriority,
       handleClickDelete,
       handleTaskValueChange
@@ -44,27 +45,27 @@ class ToDo extends React.Component {
               type="text"
               className="form-control"
               value={name}
-              onChange={() => handleTaskValueChange(id)}
+              onChange={() => handleTaskValueChange(uuid)}
             />
           </div>
-          <div className="mt-2 mb-3">
+          <div className="mt-2 mb-2">
             <button
               className={this.btnClass(priority)}
-              id={id}
-              onClick={() => handleClickPriority(id)}
+              id={uuid}
+              onClick={() => handleClickPriority(uuid)}
             >
               {priority}
             </button>
             <button
               className="ml-3 btn btn-danger"
-              id={id}
-              onClick={() => handleClickDelete(id)}
+              id={uuid}
+              onClick={() => handleClickDelete(uuid)}
             >
               X
             </button>
           </div>
         </div>
-        <small className="">
+        <small className="text-secondary">
           {date.toLocaleDateString()} - {date.toLocaleTimeString()}
         </small>
       </li>
@@ -108,19 +109,19 @@ class ToDoList extends React.Component {
     this.state = {
       list: [
         {
-          id: 0,
+          uuid: uuid(),
           name: "faire la vaisselle",
           priority: 3,
           date: new Date("September 2, 2020 15:00:00")
         },
         {
-          id: 1,
+          uuid: uuid(),
           name: "arroser le potager",
           priority: 3,
           date: new Date("September 5, 2020 15:00:00")
         },
         {
-          id: 2,
+          uuid: uuid(),
           name: "commander du ba13",
           priority: 3,
           date: new Date()
@@ -153,7 +154,7 @@ class ToDoList extends React.Component {
       if (event.keyCode === 13) {
         const currentList = state.list;
         const newTask = {
-          id: 3,
+          uuid: uuid(),
           name: event.target.value,
           priority: 3,
           date: new Date()
@@ -167,12 +168,12 @@ class ToDoList extends React.Component {
 
   // modify the task text
   // !!!! how to update without afect the table sorting ??
-  handleTaskValueChange(id) {
+  handleTaskValueChange(uuid) {
     this.setState((state) => {
       const listWithoutModifiedTask = state.list.filter(
-        (task) => task.id !== id
+        (task) => task.uuid !== uuid
       );
-      const modifiedTask = state.list.find((task) => task.id === id);
+      const modifiedTask = state.list.find((task) => task.uuid === uuid);
 
       const updatedTask = { ...modifiedTask, name: event.target.value };
       console.log("updatedTask : " + JSON.stringify(updatedTask));
@@ -193,12 +194,14 @@ class ToDoList extends React.Component {
   }
 
   // change the priority of the task
-  handlePriorityChange(id) {
+  handlePriorityChange(uuid) {
     this.setState((state) => {
       // get the array without the task clicked
-      const listWithoutClicked = state.list.filter((task) => task.id !== id);
+      const listWithoutClicked = state.list.filter(
+        (task) => task.uuid !== uuid
+      );
       // get the task clicked
-      const clickedTask = state.list.find((task) => task.id === id);
+      const clickedTask = state.list.find((task) => task.uuid === uuid);
       // update the task priority
       const uploadedTask = {
         ...clickedTask,
@@ -214,10 +217,10 @@ class ToDoList extends React.Component {
   }
 
   // delete a task
-  handleDelete(id) {
+  handleDelete(uuid) {
     this.setState((state) => {
       const listWithoutClicked = this.state.list.filter(
-        (task) => task.id !== id
+        (task) => task.uuid !== uuid
       );
       return { list: listWithoutClicked };
     });
@@ -235,7 +238,7 @@ class ToDoList extends React.Component {
           {this.state.list.map((task) => {
             return (
               <ToDo
-                key={task.id}
+                key={task.uuid}
                 task={task}
                 handleTaskValueChange={this.handleTaskValueChange}
                 handleClickPriority={this.handlePriorityChange}
