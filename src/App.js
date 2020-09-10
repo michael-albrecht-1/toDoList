@@ -31,19 +31,27 @@ class ToDo extends React.Component {
   render() {
     const {
       task: { name, priority, date, id },
-      handleClick,
-      handleClickDelete
+      handleClickPriority,
+      handleClickDelete,
+      handleTaskValueChange
     } = this.props;
 
     return (
       <li className="list-group-item">
         <div className="d-flex w-100 justify-content-between">
-          <div className="mt-2">{name}</div>
-          <div className="">
+          <div className="mt-2">
+            <input
+              type="text"
+              className="form-control"
+              value={name}
+              onChange={() => handleTaskValueChange(id)}
+            />
+          </div>
+          <div className="mt-2">
             <button
               className={this.btnClass(priority)}
               id={id}
-              onClick={() => handleClick(id)}
+              onClick={() => handleClickPriority(id)}
             >
               {priority}
             </button>
@@ -102,6 +110,7 @@ class ToDoList extends React.Component {
     this.handlePriorityChange = this.handlePriorityChange.bind(this);
     this.calculatePriority = this.calculatePriority.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleTaskValueChange = this.handleTaskValueChange.bind(this);
   }
 
   calculatePriority(number) {
@@ -111,6 +120,22 @@ class ToDoList extends React.Component {
       number++;
     }
     return number;
+  }
+
+  handleTaskValueChange(id) {
+    this.setState((state) => {
+      const listWithoutModifiedTask = state.list.filter(
+        (task) => task.id !== id
+      );
+      const modifiedTask = state.list.find((task) => task.id === id);
+
+      const updatedTask = { ...modifiedTask, name: event.target.value };
+      console.log("updatedTask : " + JSON.stringify(updatedTask));
+
+      const updatedList = [...listWithoutModifiedTask, updatedTask];
+
+      return { list: updatedList };
+    });
   }
 
   // change the priority of the task
@@ -154,7 +179,8 @@ class ToDoList extends React.Component {
               <ToDo
                 key={task.id}
                 task={task}
-                handleClick={this.handlePriorityChange}
+                handleTaskValueChange={this.handleTaskValueChange}
+                handleClickPriority={this.handlePriorityChange}
                 handleClickDelete={this.handleDelete}
               />
             );
