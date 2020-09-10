@@ -140,6 +140,13 @@ class ToDoList extends React.Component {
     this.handleReinitNewTaskInput = this.handleReinitNewTaskInput.bind(this);
   }
 
+  // sort the list of tasks
+  sortList(list) {
+    return list
+      .sort((task1, task2) => task1.date - task2.date)
+      .sort((task1, task2) => task1.priority - task2.priority);
+  }
+
   // controlled input new task
   handleNewTaskInputChange() {
     this.setState({
@@ -164,8 +171,6 @@ class ToDoList extends React.Component {
   }
 
   // handle add new task validation form
-  // !!! to do : reinit form after adding a new task
-  // !!! click "+" button should valid formulary
   handleKeyDownAddTask() {
     console.log("key down : " + event.keyCode);
     this.setState((state) => {
@@ -177,7 +182,6 @@ class ToDoList extends React.Component {
           priority: 3,
           date: new Date()
         };
-        console.log("new task : " + JSON.stringify(newTask));
         const updatedList = [...currentList, newTask];
         return {
           list: updatedList,
@@ -188,20 +192,16 @@ class ToDoList extends React.Component {
   }
 
   // modify the task text
-  // !!!! how to update without afect the table sorting ??
   handleTaskValueChange(uuid) {
     this.setState((state) => {
       const listWithoutModifiedTask = state.list.filter(
         (task) => task.uuid !== uuid
       );
       const modifiedTask = state.list.find((task) => task.uuid === uuid);
-
       const updatedTask = { ...modifiedTask, name: event.target.value };
-      console.log("updatedTask : " + JSON.stringify(updatedTask));
-
       const updatedList = [...listWithoutModifiedTask, updatedTask];
-
-      return { list: updatedList };
+      const sortedUpdatedList = this.sortList(updatedList);
+      return { list: sortedUpdatedList };
     });
   }
 
@@ -229,9 +229,7 @@ class ToDoList extends React.Component {
         priority: this.calculatePriority(clickedTask.priority)
       };
       // update the global array
-      const updatedList = [...listWithoutClicked, uploadedTask].sort(
-        (task1, task2) => task1.priority - task2.priority
-      );
+      const updatedList = this.sortList([...listWithoutClicked, uploadedTask]);
       // return the setState
       return { list: updatedList };
     });
@@ -258,7 +256,7 @@ class ToDoList extends React.Component {
           handleReinitNewTaskInput={this.handleReinitNewTaskInput}
         />
         <ul className="list-group">
-          {this.state.list.map((task) => {
+          {this.sortList(this.state.list).map((task) => {
             return (
               <ToDo
                 key={task.uuid}
