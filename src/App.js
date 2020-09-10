@@ -47,7 +47,7 @@ class ToDo extends React.Component {
               onChange={() => handleTaskValueChange(id)}
             />
           </div>
-          <div className="mt-2">
+          <div className="mt-2 mb-3">
             <button
               className={this.btnClass(priority)}
               id={id}
@@ -64,7 +64,9 @@ class ToDo extends React.Component {
             </button>
           </div>
         </div>
-        <small className="mt-3">{date.toLocaleTimeString()}</small>
+        <small className="">
+          {date.toLocaleDateString()} - {date.toLocaleTimeString()}
+        </small>
       </li>
     );
   }
@@ -72,11 +74,29 @@ class ToDo extends React.Component {
 
 class NewToDo extends React.Component {
   render() {
+    const {
+      handleKeyDownAddTask,
+      handleNewTaskInputChange,
+      newTaskValue
+    } = this.props;
     return (
-      <div className="card mb-3 mt-4">
-        <p className="mt-3">
-          new to do !<span className="text-danger ml-3">(to build !)</span>
-        </p>
+      <div className="card mb-3 mt-4 ">
+        <div className="card-body d-flex justify-content-start">
+          <div>
+            <input
+              className="form-control"
+              type="text"
+              name="newTask"
+              id="newTask"
+              value={newTaskValue}
+              onKeyDown={() => handleKeyDownAddTask()}
+              onChange={() => handleNewTaskInputChange()}
+            />
+          </div>
+          <div className="ml-4">
+            <button className="btn btn-success">+</button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -91,13 +111,13 @@ class ToDoList extends React.Component {
           id: 0,
           name: "faire la vaisselle",
           priority: 3,
-          date: new Date()
+          date: new Date("September 2, 2020 15:00:00")
         },
         {
           id: 1,
           name: "arroser le potager",
           priority: 3,
-          date: new Date()
+          date: new Date("September 5, 2020 15:00:00")
         },
         {
           id: 2,
@@ -105,23 +125,48 @@ class ToDoList extends React.Component {
           priority: 3,
           date: new Date()
         }
-      ]
+      ],
+      newTaskValue: "Ajouter une nouvelle tâche"
     };
     this.handlePriorityChange = this.handlePriorityChange.bind(this);
     this.calculatePriority = this.calculatePriority.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleTaskValueChange = this.handleTaskValueChange.bind(this);
+    this.handleKeyDownAddTask = this.handleKeyDownAddTask.bind(this);
+    this.handleNewTaskInputChange = this.handleNewTaskInputChange.bind(this);
   }
 
-  calculatePriority(number) {
-    if (number === 3) {
-      number = 1;
-    } else {
-      number++;
-    }
-    return number;
+  // controlled input new task
+  handleNewTaskInputChange() {
+    this.setState({
+      newTaskValue: event.target.value
+    });
   }
 
+  // handle add new task validation form
+  // !!! to do : reinit form after adding a new task
+  // !!! clean the input text when we click inside to add a task
+  // !!! click "+" button should valid formulary
+  handleKeyDownAddTask() {
+    console.log("key down : " + event.keyCode);
+    this.setState((state) => {
+      if (event.keyCode === 13) {
+        const currentList = state.list;
+        const newTask = {
+          id: 3,
+          name: event.target.value,
+          priority: 3,
+          date: new Date()
+        };
+        console.log("new task : " + JSON.stringify(newTask));
+        const updatedList = [...currentList, newTask];
+        return { list: updatedList };
+      }
+    });
+  }
+
+  // modify the task text
+  // !!!! how to update without afect the table sorting ??
   handleTaskValueChange(id) {
     this.setState((state) => {
       const listWithoutModifiedTask = state.list.filter(
@@ -136,6 +181,15 @@ class ToDoList extends React.Component {
 
       return { list: updatedList };
     });
+  }
+
+  calculatePriority(number) {
+    if (number === 3) {
+      number = 1;
+    } else {
+      number++;
+    }
+    return number;
   }
 
   // change the priority of the task
@@ -172,7 +226,11 @@ class ToDoList extends React.Component {
   render() {
     return (
       <div>
-        <NewToDo />
+        <NewToDo
+          handleKeyDownAddTask={this.handleKeyDownAddTask}
+          handleNewTaskInputChange={this.handleNewTaskInputChange}
+          newTaskValue={this.state.newTaskValue}
+        />
         <ul className="list-group">
           {this.state.list.map((task) => {
             return (
