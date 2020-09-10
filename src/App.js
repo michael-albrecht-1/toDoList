@@ -79,7 +79,8 @@ class NewToDo extends React.Component {
       handleKeyDownAddTask,
       handleNewTaskInputChange,
       newTaskValue,
-      handleNewTaskInputClick
+      handleNewTaskInputClick,
+      handleReinitNewTaskInput
     } = this.props;
     return (
       <div className="card mb-3 mt-4 ">
@@ -93,11 +94,9 @@ class NewToDo extends React.Component {
               value={newTaskValue}
               onKeyDown={() => handleKeyDownAddTask()}
               onChange={() => handleNewTaskInputChange()}
-              onClick={() => handleNewTaskInputClick()}
+              onMouseDown={() => handleNewTaskInputClick()}
+              onBlur={() => handleReinitNewTaskInput()}
             />
-          </div>
-          <div className="ml-4">
-            <button className="btn btn-success">+</button>
           </div>
         </div>
       </div>
@@ -138,6 +137,7 @@ class ToDoList extends React.Component {
     this.handleKeyDownAddTask = this.handleKeyDownAddTask.bind(this);
     this.handleNewTaskInputChange = this.handleNewTaskInputChange.bind(this);
     this.handleNewTaskInputClick = this.handleNewTaskInputClick.bind(this);
+    this.handleReinitNewTaskInput = this.handleReinitNewTaskInput.bind(this);
   }
 
   // controlled input new task
@@ -153,6 +153,13 @@ class ToDoList extends React.Component {
       if (this.state.newTaskValue === "Ajouter une nouvelle tâche") {
         return { newTaskValue: "" };
       }
+    });
+  }
+
+  // réinit input on blur
+  handleReinitNewTaskInput() {
+    this.setState({
+      newTaskValue: "Ajouter une nouvelle tâche"
     });
   }
 
@@ -172,7 +179,10 @@ class ToDoList extends React.Component {
         };
         console.log("new task : " + JSON.stringify(newTask));
         const updatedList = [...currentList, newTask];
-        return { list: updatedList };
+        return {
+          list: updatedList,
+          newTaskValue: ""
+        };
       }
     });
   }
@@ -245,6 +255,7 @@ class ToDoList extends React.Component {
           handleNewTaskInputChange={this.handleNewTaskInputChange}
           newTaskValue={this.state.newTaskValue}
           handleNewTaskInputClick={this.handleNewTaskInputClick}
+          handleReinitNewTaskInput={this.handleReinitNewTaskInput}
         />
         <ul className="list-group">
           {this.state.list.map((task) => {
