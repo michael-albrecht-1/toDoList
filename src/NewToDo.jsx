@@ -19,8 +19,8 @@ export class NewToDo extends Component {
               name="newTask"
               id="newTask"
               value={newTaskValue}
-              onKeyDown={() => handleKeyDownAddTask()}
-              onChange={() => handleNewTaskInputChange()}
+              onKeyDown={(e) => handleKeyDownAddTask(e)}
+              onChange={(e) => handleNewTaskInputChange(e)}
               onMouseDown={() => handleNewTaskInputClick()}
               onBlur={() => handleReinitNewTaskInput()}
             />

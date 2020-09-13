@@ -43,9 +43,9 @@ class ToDoList extends React.Component {
     this.handleReinitNewTaskInput = this.handleReinitNewTaskInput.bind(this);
   }
 
-  handleNewTaskInputChange() {
+  handleNewTaskInputChange(e) {
     this.setState({
-      newTaskValue: event.target.value
+      newTaskValue: e.target.value
     });
   }
 
@@ -63,14 +63,15 @@ class ToDoList extends React.Component {
     });
   }
 
-  handleKeyDownAddTask() {
-    console.log("key down : " + event.keyCode);
+  handleKeyDownAddTask(e) {
+    console.log("key down : " + e.keyCode);
+    e.persist();
     this.setState((state) => {
-      if (event.keyCode === 13) {
+      if (e.keyCode === 13) {
         const currentList = state.list;
         const newTask = {
           uuid: uuid(),
-          name: event.target.value,
+          name: e.target.value,
           priority: 3,
           date: new Date()
         };
@@ -83,13 +84,14 @@ class ToDoList extends React.Component {
     });
   }
 
-  handleTaskValueChange(uuid) {
+  handleTaskValueChange(e, uuid) {
+    e.persist();
     this.setState((state) => {
       const listWithoutModifiedTask = state.list.filter(
         (task) => task.uuid !== uuid
       );
       const modifiedTask = state.list.find((task) => task.uuid === uuid);
-      const updatedTask = { ...modifiedTask, name: event.target.value };
+      const updatedTask = { ...modifiedTask, name: e.target.value };
       const updatedList = [...listWithoutModifiedTask, updatedTask];
       return { list: updatedList };
     });

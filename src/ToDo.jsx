@@ -41,7 +41,7 @@ export class ToDo extends Component {
               type="text"
               className="form-control"
               value={name}
-              onChange={() => handleTaskValueChange(uuid)}
+              onChange={(e) => handleTaskValueChange(e, uuid)}
             />
           </div>
           <div className="mt-2 mb-2">
