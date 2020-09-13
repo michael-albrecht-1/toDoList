@@ -4,105 +4,8 @@ import "./styles.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
 
-class ToDo extends React.Component {
-  constructor(props) {
-    super(props);
-    this.btnClass = this.btnClass.bind(this);
-  }
-
-  btnClass(prio) {
-    let btnClass = null;
-    switch (prio) {
-      case 1:
-        btnClass = "btn btn-danger";
-        break;
-      case 2:
-        btnClass = "btn btn-warning";
-        break;
-      case 3:
-        btnClass = "btn btn-primary";
-        break;
-      default:
-        btnClass = "btn btn-primary";
-        break;
-    }
-    return btnClass;
-  }
-
-  render() {
-    const {
-      task: { name, priority, date, uuid },
-      handleClickPriority,
-      handleClickDelete,
-      handleTaskValueChange
-    } = this.props;
-
-    return (
-      <li className="list-group-item">
-        <div className="d-flex w-100 justify-content-between">
-          <div className="mt-2">
-            <input
-              type="text"
-              className="form-control"
-              value={name}
-              onChange={() => handleTaskValueChange(uuid)}
-            />
-          </div>
-          <div className="mt-2 mb-2">
-            <button
-              className={this.btnClass(priority)}
-              id={uuid}
-              onClick={() => handleClickPriority(uuid)}
-            >
-              {priority}
-            </button>
-            <button
-              className="ml-3 btn btn-danger"
-              id={uuid}
-              onClick={() => handleClickDelete(uuid)}
-            >
-              X
-            </button>
-          </div>
-        </div>
-        <small className="text-secondary">
-          {date.toLocaleDateString()} - {date.toLocaleTimeString()}
-        </small>
-      </li>
-    );
-  }
-}
-
-class NewToDo extends React.Component {
-  render() {
-    const {
-      handleKeyDownAddTask,
-      handleNewTaskInputChange,
-      newTaskValue,
-      handleNewTaskInputClick,
-      handleReinitNewTaskInput
-    } = this.props;
-    return (
-      <div className="card mb-3 mt-4 ">
-        <div className="card-body d-flex justify-content-start">
-          <div>
-            <input
-              className="form-control"
-              type="text"
-              name="newTask"
-              id="newTask"
-              value={newTaskValue}
-              onKeyDown={() => handleKeyDownAddTask()}
-              onChange={() => handleNewTaskInputChange()}
-              onMouseDown={() => handleNewTaskInputClick()}
-              onBlur={() => handleReinitNewTaskInput()}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
+import { ToDo } from "./ToDo";
+import { NewToDo } from "./NewToDo";
 
 class ToDoList extends React.Component {
   constructor(props) {
@@ -140,21 +43,12 @@ class ToDoList extends React.Component {
     this.handleReinitNewTaskInput = this.handleReinitNewTaskInput.bind(this);
   }
 
-  // sort the list of tasks
-  sortList(list) {
-    return list
-      .sort((task1, task2) => task1.date - task2.date)
-      .sort((task1, task2) => task1.priority - task2.priority);
-  }
-
-  // controlled input new task
   handleNewTaskInputChange() {
     this.setState({
       newTaskValue: event.target.value
     });
   }
 
-  // clean the input text when we click inside
   handleNewTaskInputClick() {
     this.setState((state) => {
       if (this.state.newTaskValue === "Ajouter une nouvelle tâche") {
@@ -163,14 +57,12 @@ class ToDoList extends React.Component {
     });
   }
 
-  // réinit input on blur
   handleReinitNewTaskInput() {
     this.setState({
       newTaskValue: "Ajouter une nouvelle tâche"
     });
   }
 
-  // handle add new task validation form
   handleKeyDownAddTask() {
     console.log("key down : " + event.keyCode);
     this.setState((state) => {
@@ -191,7 +83,6 @@ class ToDoList extends React.Component {
     });
   }
 
-  // modify the task text
   handleTaskValueChange(uuid) {
     this.setState((state) => {
       const listWithoutModifiedTask = state.list.filter(
@@ -200,8 +91,7 @@ class ToDoList extends React.Component {
       const modifiedTask = state.list.find((task) => task.uuid === uuid);
       const updatedTask = { ...modifiedTask, name: event.target.value };
       const updatedList = [...listWithoutModifiedTask, updatedTask];
-      const sortedUpdatedList = this.sortList(updatedList);
-      return { list: sortedUpdatedList };
+      return { list: updatedList };
     });
   }
 
@@ -214,28 +104,21 @@ class ToDoList extends React.Component {
     return number;
   }
 
-  // change the priority of the task
   handlePriorityChange(uuid) {
     this.setState((state) => {
-      // get the array without the task clicked
       const listWithoutClicked = state.list.filter(
         (task) => task.uuid !== uuid
       );
-      // get the task clicked
       const clickedTask = state.list.find((task) => task.uuid === uuid);
-      // update the task priority
       const uploadedTask = {
         ...clickedTask,
         priority: this.calculatePriority(clickedTask.priority)
       };
-      // update the global array
-      const updatedList = this.sortList([...listWithoutClicked, uploadedTask]);
-      // return the setState
+      const updatedList = [...listWithoutClicked, uploadedTask];
       return { list: updatedList };
     });
   }
 
-  // delete a task
   handleDelete(uuid) {
     this.setState((state) => {
       const listWithoutClicked = this.state.list.filter(
@@ -256,7 +139,7 @@ class ToDoList extends React.Component {
           handleReinitNewTaskInput={this.handleReinitNewTaskInput}
         />
         <ul className="list-group">
-          {this.sortList(this.state.list).map((task) => {
+          {sortToDoListByPriorityAndDate(this.state.list).map((task) => {
             return (
               <ToDo
                 key={task.uuid}
@@ -279,4 +162,12 @@ export default function App() {
       <ToDoList />
     </div>
   );
+}
+
+function sortToDoListByPriorityAndDate(list) {
+  const copyList = [...list];
+
+  return copyList
+    .sort((task1, task2) => task1.date - task2.date)
+    .sort((task1, task2) => task1.priority - task2.priority);
 }
